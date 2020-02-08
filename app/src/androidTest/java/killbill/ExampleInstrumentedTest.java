@@ -1,4 +1,4 @@
-package com.example.killbill;
+package killbill;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.example.killbill", appContext.getPackageName());
+        assertEquals("killbill", appContext.getPackageName());
     }
 }
