@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">KillBill</string>
     <string name="scan">Scan</string>
+    <string name="scan_image">Scanned Image</string>
+    <string name="go_scan">Let\'s Scan!</string>
 </resources>
