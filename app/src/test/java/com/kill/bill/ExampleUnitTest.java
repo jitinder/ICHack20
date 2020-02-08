@@ -1,4 +1,4 @@
-package killbill;
+package com.kill.bill;
 
 import org.junit.Test;
 
