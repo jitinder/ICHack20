@@ -21,13 +21,14 @@
             android:name="android.support.FILE_PROVIDER_PATHS"
             android:resource="@xml/file_paths" />
     </provider>
-        <activity android:name=".Splash"></activity>
+
+        <activity android:name=".Splash" />
         <activity android:name=".TestAzureActivity">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>

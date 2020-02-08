@@ -4,6 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FCD612"
     tools:context=".Splash">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="353dp"
+        android:layout_height="697dp"
+        android:src="@drawable/splash_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteY="-43dp" />
+
+    <ImageView
+        android:layout_width="148dp"
+        android:layout_height="128dp"
+        android:src="@drawable/loading"
+        app:layout_constraintEnd_toStartOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteY="563dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

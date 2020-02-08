@@ -16,6 +16,6 @@ public class MainActivity extends AppCompatActivity {
 
   public void onClick(View view) {
     /* Switch to ScanActivity */
-    startActivity(new Intent(this, ScanActivity.class));
+    startActivity(new Intent(this, Splash.class));
   }
 }
