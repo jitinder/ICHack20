@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -29,6 +30,9 @@ import android.os.Bundle;
 import android.net.Uri;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class TestAzureActivity extends AppCompatActivity {
@@ -112,6 +116,7 @@ public class TestAzureActivity extends AppCompatActivity {
                         InputStream responseBody = jsonConnection.getInputStream();
                         InputStreamReader responseBodyReader =
                                 new InputStreamReader(responseBody, "UTF-8");
+
                         JsonReader jsonReader = new JsonReader(responseBodyReader);
 
                         jsonReader.beginObject(); // Start processing the JSON object
@@ -122,52 +127,44 @@ public class TestAzureActivity extends AppCompatActivity {
 
                                 Log.i("JSON", value);
 
-                                if (!value.equals("Succeeded")){
+                                if (!value.equals("Succeeded")) {
                                     throw new RuntimeException("Failed to parse text from image: status was not Succeeded");
                                 }
-                                break;
+                            } else if (key.equals("recognitionResults")) {
+                                jsonReader.beginArray();
+                                jsonReader.beginObject();
+
                             } else {
                                 jsonReader.skipValue(); // Skip values of other keys
                             }
                         }
 
-                        jsonReader.close();
-                        jsonConnection.disconnect();
+
+                            jsonReader.close();
+                            jsonConnection.disconnect();
+
 
                     } else if ( response == 202) {
-                        Log.d("CHECKOUT", "202");
+                            Log.d("CHECKOUT", "202");
 
-                    } else{
-                        // Error handling code goes here
-                        Log.e("CHECKOUT", "Failed with " + response);
-                        Log.e("CHECKOUT", "Failed with " + jsonConnection);
-                    }
+                        } else{
+                            // Error handling code goes here
+                            Log.e("CHECKOUT", "Failed with " + response);
+                            Log.e("CHECKOUT", "Failed with " + jsonConnection);
+                        }
 
-                    Log.d("CHECKOUTLENGTH", outputEndpoint);
-
-
-
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (ProtocolException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                        Log.d("CHECKOUTLENGTH", outputEndpoint);
+                } catch (MalformedURLException ex) {
+                    ex.printStackTrace();
+                } catch (ProtocolException ex) {
+                    ex.printStackTrace();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
                 }
-
-
             }
         });
-      
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.imgur.com/3/image")
-        .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build();
 
         Button takeImageButton = findViewById(R.id.takePictureButton);
         takeImageButton.setOnClickListener(new View.OnClickListener() {
