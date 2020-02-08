@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "267712485410",
+    "firebase_url": "https://killbill-8ef96.firebaseio.com",
+    "project_id": "killbill-8ef96",
+    "storage_bucket": "killbill-8ef96.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267712485410:android:d5d4fd421e1c7bc95ad27b",
+        "android_client_info": {
+          "package_name": "com.kill.bill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "267712485410-2pd5sktjci8jakheg584vcu8o0rjm8de.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWbEvVuTiUNAeXlKuF5akS-geCuEcEXB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "267712485410-2pd5sktjci8jakheg584vcu8o0rjm8de.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

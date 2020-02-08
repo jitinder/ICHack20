@@ -1,10 +1,12 @@
 package com.kill.bill;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
-import android.net.Uri;
-
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class TestAzureActivity extends AppCompatActivity {
@@ -25,7 +27,7 @@ public class TestAzureActivity extends AppCompatActivity {
         setContentView(R.layout.activity_test_azure);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(https://api.themoviedb.org/3/)
+                .baseUrl("https://api.themoviedb.org/3/")
         .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
