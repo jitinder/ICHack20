@@ -38,7 +38,7 @@ public class ItemAdapter extends ArrayAdapter<Item> {
 
     if (item != null) {
       itemNameTV.setText(item.getName());
-      itemPriceTV.setText(String.valueOf(item.getPrice()));
+      itemPriceTV.setText("£" + String.valueOf(item.getPrice()));
       itemQuantTV.setText(String.format(Locale.ENGLISH, "Quantity: %d", item.getQuantity()));
     }
 
