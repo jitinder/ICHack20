@@ -98,11 +98,12 @@ public class ItemAdapter extends ArrayAdapter<Item> {
           alertDialog.show();
         });
 
-    convertView.setOnClickListener(o -> {
-        Intent intent = new Intent(parent.getContext(), TransactionDetails.class);
-        intent.putExtra("item", item);
-        parent.getContext().startActivity(intent);
-    });
+    convertView.setOnClickListener(
+        o -> {
+          Intent intent = new Intent(parent.getContext(), TransactionDetails.class);
+          intent.putExtra("item", item);
+          parent.getContext().startActivity(intent);
+        });
 
     return convertView;
   }
