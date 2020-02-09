@@ -1,84 +1,75 @@
 package com.kill.bill;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
 
-public class TestAzureActivity extends AppCompatActivity {
+import javax.net.ssl.HttpsURLConnection;
 
-  private static final String baseUrl = "gs://killbill-8ef96.appspot.com/scanned_images";
+public class TestAzureActivity extends AppCompatActivity {
 
   private static final String subscriptionKey = System.getenv("COMPUTER_VISION_SUBSCRIPTION_KEY");
   private static final String endpoint = ("COMPUTER_VISION_ENDPOINT");
 
   private static final int REQUEST_IMAGE_CAPTURE = 1;
 
-  private Uri imageUri;
-
-  private static FirebaseAuth auth;
-
-  private static final String uriBase = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
-
   private static final String imageToAnalyze = "https://i.imgur.com/TQXB8ds.jpg";
 
-  GoogleSignInClient client;
+  private static final String readURI = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_test_azure);
 
-    auth = FirebaseAuth.getInstance();
+    Log.e("SUBKEY", "" + subscriptionKey);
 
-    /*Retrofit retrofit =
-    new Retrofit.Builder()
-        .baseUrl("https://api.imgur.com/3/image")
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .build();*/
+    new GetImageText(this).execute(readURI, null, "");
 
-    Button takeImageButton = findViewById(R.id.takePictureButton);
-
+    Button takeImageButton = findViewById(R.id.take_picture_button);
     takeImageButton.setOnClickListener(
         view -> {
           StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
           StrictMode.setVmPolicy(builder.build());
-          imageUri = takePhoto();
+          Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+          this.startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
         });
-  }
 
-  public Uri takePhoto() {
-    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-    Uri uri = Uri.fromFile(new File(getFilesDir() + "/pic.jpg"));
-
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, this.imageUri);
-
-    this.startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-
-    return uri;
+    Button goToPayload = findViewById(R.id.go_to_payload);
+    goToPayload.setOnClickListener(
+        view -> {
+          Intent intent = new Intent(view.getContext(), PayLoadParser.class);
+          startActivity(intent);
+        });
   }
 
   @Override
@@ -98,16 +89,13 @@ public class TestAzureActivity extends AppCompatActivity {
 
       SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
 
-      imageUri =
-          Uri.parse(
-                  sdf.format(Calendar.getInstance().getTime()));
+      Uri imageUri = Uri.parse(sdf.format(Calendar.getInstance().getTime()));
 
       File file;
 
       try {
-        file = File.createTempFile(
-                "/scanned_picture:"
-                + imageUri.toString(), ".jpg", getFilesDir());
+        file =
+            File.createTempFile("/scanned_picture:" + imageUri.toString(), ".jpg", getFilesDir());
       } catch (IOException e) {
         e.printStackTrace();
         return;
@@ -137,6 +125,114 @@ public class TestAzureActivity extends AppCompatActivity {
 
       task.addOnFailureListener(o -> System.out.println("Failure"))
           .addOnSuccessListener(o -> System.out.println("Success"));
+    }
+  }
+
+  private static class GetImageText extends AsyncTask<String, Void, String> {
+    private ProgressDialog dialog;
+
+    public GetImageText(Activity activity) {
+      this.dialog = new ProgressDialog(activity);
+    }
+
+    @Override
+    protected String doInBackground(String... strings) {
+      try {
+        URL readURI = new URL(strings[0]);
+        HttpsURLConnection readConnection = (HttpsURLConnection) readURI.openConnection();
+
+        String myData = "{\"url\":\"" + imageToAnalyze + "\"}";
+
+        readConnection.setRequestMethod("POST");
+        readConnection.setRequestProperty("Content-Type", "application/json");
+        readConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
+
+        // Enable writing
+        readConnection.setDoOutput(true);
+
+        // Write the data
+        readConnection.getOutputStream().write(myData.getBytes());
+
+        String outputEndpoint = "";
+
+        int response = readConnection.getResponseCode();
+        if (response == 200) {
+          Log.d("CHECK", "200");
+        } else if (response == 202) {
+          Log.d("CHECK", "202");
+
+          outputEndpoint = readConnection.getHeaderField("Operation-Location");
+
+        } else {
+          // Error handling code goes here
+          Log.e("CHECK", "Failed with " + response);
+          Log.e("CHECK", "Failed with " + readConnection);
+        }
+
+        Log.d("CHECK", outputEndpoint);
+
+        Thread.sleep(2000);
+
+        URL jsonURI = new URL(outputEndpoint);
+        HttpsURLConnection jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
+
+        jsonConnection.setRequestMethod("GET");
+
+        jsonConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
+
+        response = jsonConnection.getResponseCode();
+        if (response == 200) {
+          Log.d("CHECKOUT", "200");
+
+          InputStream responseBody = jsonConnection.getInputStream();
+          InputStreamReader responseBodyReader =
+              new InputStreamReader(responseBody, StandardCharsets.UTF_8);
+          BufferedReader br = new BufferedReader(responseBodyReader);
+          StringBuilder sb = new StringBuilder();
+
+          String inputLine;
+          while ((inputLine = br.readLine()) != null) {
+            sb.append(inputLine);
+            System.out.println(inputLine);
+          }
+
+          br.close();
+
+          // System.out.println(sb.toString());
+          jsonConnection.disconnect();
+
+          return sb.toString();
+
+        } else if (response == 202) {
+          Log.d("CHECKOUT", "202");
+
+        } else {
+          // Error handling code goes here
+          Log.e("CHECKOUT", "Failed with " + response);
+          Log.e("CHECKOUT", "Failed with " + jsonConnection);
+        }
+
+        Log.d("CHECKOUTLENGTH", outputEndpoint);
+
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return "";
+    }
+
+    @Override
+    protected void onPreExecute() {
+      super.onPreExecute();
+      dialog.setMessage("Analysing your receipt");
+      dialog.show();
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+      super.onPostExecute(s);
+      dialog.dismiss();
+      System.out.println("Payload: " + s);
     }
   }
 }
