@@ -7,7 +7,7 @@
     tools:context=".PayLoadParser">
 
     <ListView
-        android:id="@+id/payloadItems"
+        android:id="@+id/payload_items"
         android:layout_height="match_parent"
         android:layout_width="match_parent"/>
 </LinearLayout>
