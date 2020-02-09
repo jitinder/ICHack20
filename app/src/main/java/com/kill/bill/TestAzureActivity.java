@@ -189,7 +189,7 @@ public class TestAzureActivity extends AppCompatActivity {
         }
     }
 
-    private class GetImageText extends AsyncTask<Holder, Void, String> {
+  private class GetImageText extends AsyncTask<Holder, Void, String> {
 
         @Override
         protected String doInBackground(Holder... holders) {
