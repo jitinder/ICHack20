@@ -147,6 +147,8 @@ public class TestAzureActivity extends AppCompatActivity {
 
                 Log.d("CHECK", outputEndpoint);
 
+                Thread.sleep(2000);
+                
                 URL jsonURI = new URL(outputEndpoint);
                 HttpsURLConnection jsonConnection =
                         (HttpsURLConnection) jsonURI.openConnection();
@@ -165,12 +167,15 @@ public class TestAzureActivity extends AppCompatActivity {
                             new InputStreamReader(responseBody, "UTF-8");
                     BufferedReader br = new BufferedReader(responseBodyReader);
                     StringBuilder sb = new StringBuilder();
+
                     String inputLine;
                     while ((inputLine = br.readLine()) != null) {
                         sb.append(inputLine);
                         System.out.println(inputLine);
                     }
+
                     br.close();
+
                     //System.out.println(sb.toString());
                     jsonConnection.disconnect();
 
