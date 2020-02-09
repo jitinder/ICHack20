@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:test="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     android:padding="16dp">
 
     <LinearLayout
@@ -14,27 +14,24 @@
 
         <TextView
             android:id="@+id/item_name"
-            test:text="Test Text"
             style="@style/TextAppearance.AppCompat.Title"
-            android:layout_weight="2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            test:text="Test Text" />
 
         <TextView
             android:id="@+id/item_price"
-            test:text="Test Text"
             style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            test:text="Test Text" />
 
         <TextView
             android:id="@+id/item_quantity"
-            test:text="Test Text"
             style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            test:text="Test Text" />
 
     </LinearLayout>
 
@@ -43,7 +40,8 @@
         android:layout_width="0dp"
         android:layout_height="24dp"
         android:layout_gravity="center"
-        android:src="@drawable/ic_mode_edit"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:contentDescription="@string/edit_info"
+        android:src="@drawable/ic_mode_edit" />
 
 </LinearLayout>

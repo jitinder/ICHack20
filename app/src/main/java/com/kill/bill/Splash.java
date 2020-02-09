@@ -8,19 +8,18 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class Splash extends AppCompatActivity {
-    private AnimationDrawable loadingAnimation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getSupportActionBar().hide();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
 
         ImageView loading = findViewById(R.id.image_view_receipt);
+
         loading.setImageResource(R.drawable.loading);
-        //loading.setBackgroundResource(R.drawable.loading);
-        loadingAnimation = (AnimationDrawable) loading.getDrawable();
+
+        AnimationDrawable loadingAnimation = (AnimationDrawable) loading.getDrawable();
         loadingAnimation.start();
     }
 

@@ -15,9 +15,9 @@
         android:fontFamily="@font/prompt_medium"
         android:gravity="top"
         android:onClick="onClick"
-        android:text="Back to Transactions"
+        android:text="@string/back_to_transactions"
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -27,10 +27,10 @@
         android:layout_height="100dp"
         android:layout_marginTop="76dp"
         android:fontFamily="@font/prompt_medium"
-        android:text="Restaurant Name"
+        android:text="@string/restaurant_name"
         android:textAlignment="center"
         android:textColor="#000000"
-        android:textSize="30dp"
+        android:textSize="30sp"
         app:layout_constraintTop_toBottomOf="@+id/backButton"
         tools:layout_editor_absoluteX="0dp" />
 
@@ -39,10 +39,10 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:fontFamily="@font/prompt_medium"
-        android:text="Amount\n£140.35"
+        android:text="@string/amount_n_140_35"
         android:textAlignment="center"
         android:textColor="#D61A1F"
-        android:textSize="40dp"
+        android:textSize="40sp"
         app:layout_constraintTop_toBottomOf="@+id/seller"
         tools:layout_editor_absoluteX="0dp" />
 
@@ -51,10 +51,10 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:fontFamily="@font/prompt_medium"
-        android:text="Date \n 02/07/2020"
+        android:text="@string/date_n_02_07_2020"
         android:textAlignment="center"
         android:textColor="#000000"
-        android:textSize="27dp"
+        android:textSize="27sp"
         app:layout_constraintTop_toBottomOf="@+id/amount"
         tools:layout_editor_absoluteX="0dp" />
 
@@ -64,8 +64,8 @@
         android:layout_height="95dp"
         android:background="@drawable/yellow_button"
         android:fontFamily="@font/prompt_extrabold"
-        android:text="KILL BILL"
-        android:textSize="26dp"
+        android:text="@string/kill_bill"
+        android:textSize="26sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

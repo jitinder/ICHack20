@@ -13,6 +13,7 @@ public class TransactionList extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     Objects.requireNonNull(getSupportActionBar()).hide();
+
     getWindow()
         .setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);

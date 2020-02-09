@@ -10,6 +10,7 @@
         android:id="@+id/logoAzure"
         android:layout_width="253dp"
         android:layout_height="289dp"
+        android:contentDescription="@string/logo"
         android:src="@drawable/kill_bill_logo"
         app:layout_constraintBottom_toTopOf="@+id/take_picture_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +26,7 @@
         android:fadingEdge="horizontal"
         android:fontFamily="@font/prompt_extrabold"
         android:text="@string/take_picture"
-        android:textSize="27dp"
+        android:textSize="27sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,17 +58,7 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/take_picture_button"
-        app:layout_constraintVertical_bias="0.401" /><![CDATA[
-
-    =======
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scan_picture_button" />
-
-
-
-    ]]>
+        app:layout_constraintVertical_bias="0.401" />
 
     <Button
         android:id="@+id/button4"
@@ -75,7 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="532dp"
         android:onClick="onClick3"
-        android:text="transaction details"
+        android:text="@string/transaction_details"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.413"
