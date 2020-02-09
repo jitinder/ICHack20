@@ -9,11 +9,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
@@ -39,126 +41,131 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class TestAzureActivity extends AppCompatActivity {
 
-    private static final String subscriptionKey = "87e56323493740c7a179825fa8cfc9ed";
-    private static final String endpoint = "https://killbillcomputervision.cognitiveservices.azure.com/";
+  private static final String subscriptionKey = "87e56323493740c7a179825fa8cfc9ed";
+  private static final String endpoint =
+      "https://killbillcomputervision.cognitiveservices.azure.com/";
 
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
+  private static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    private static Uri imageToAnalyze;
+  private static Uri imageToAnalyze;
 
-    private static final String readURI = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
+  private static final String readURI = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test_azure);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_test_azure);
 
-        Log.e("SUBKEY", "" + subscriptionKey);
+    Toolbar toolbar = findViewById(R.id.azure_toolbar);
+    setSupportActionBar(toolbar);
 
-        Button takeImageButton = findViewById(R.id.take_picture_button);
-        takeImageButton.setOnClickListener(
-                view -> {
-                    StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-                    StrictMode.setVmPolicy(builder.build());
-                    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                    this.startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                });
+    Log.e("SUBKEY", "" + subscriptionKey);
 
-        Button goToPayload = findViewById(R.id.go_to_payload);
-        goToPayload.setOnClickListener(
-                view -> {
-                    Intent intent = new Intent(view.getContext(), PayLoadParser.class);
-                    startActivity(intent);
-                });
-    }
+    Button takeImageButton = findViewById(R.id.take_picture_button);
+    takeImageButton.setOnClickListener(
+        view -> {
+          StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+          StrictMode.setVmPolicy(builder.build());
+          Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+          this.startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+        });
 
-    public void onClick2(View v) {
-        startActivity(new Intent(this, TransactionList.class));
-    }
+    Button goToPayload = findViewById(R.id.go_to_payload);
+    goToPayload.setOnClickListener(
+        view -> {
+          Intent intent = new Intent(view.getContext(), PayLoadParser.class);
+          startActivity(intent);
+        });
+  }
 
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == REQUEST_IMAGE_CAPTURE) {
+      Bitmap bm;
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            Bitmap bm;
-
-            if (data == null || data.getExtras() == null) {
-                return;
-            }
-
-            bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
-
+      if (data == null || data.getExtras() == null) {
+        return;
+      }
 
             Intent intent = new Intent(TestAzureActivity.this, Splash.class);
             intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
             startActivity(intent);
 
-            //((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
+      bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
+      // ((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
 
-            imageToAnalyze = Uri.parse(sdf.format(Calendar.getInstance().getTime()));
+      SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
 
-            File file;
-            String prefix = imageToAnalyze.toString();
+      imageToAnalyze = Uri.parse(sdf.format(Calendar.getInstance().getTime()));
 
-            try {
-                File outputDir = TestAzureActivity.this.getCacheDir(); // context being the Activity pointer
-                file = File.createTempFile(prefix, "jpg", outputDir);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
+      File file;
+      String prefix = imageToAnalyze.toString();
 
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageReference = storage.getReference();
-            StorageReference imageRef =
-                    storageReference.child("scanned/" + imageToAnalyze.toString() + ".jpg");
+      try {
+        File outputDir = TestAzureActivity.this.getCacheDir(); // context being the Activity pointer
 
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        file = File.createTempFile(prefix, "jpg", outputDir);
+      } catch (IOException e) {
+        e.printStackTrace();
+        return;
+      }
 
-            if (bm == null) {
-                return;
-            }
+      FirebaseStorage storage = FirebaseStorage.getInstance();
+      StorageReference storageReference = storage.getReference();
+      StorageReference imageRef =
+          storageReference.child("scanned/" + imageToAnalyze.toString() + ".jpg");
 
-            bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] bytes = stream.toByteArray();
+      ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-            try {
-                FileOutputStream fos = new FileOutputStream(file);
-                fos.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+      if (bm == null) {
+        return;
+      }
 
-            UploadTask task = imageRef.putFile(Uri.fromFile(file));
+      bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+      byte[] bytes = stream.toByteArray();
 
-            task.addOnFailureListener(o -> System.out.println("Failure"))
-                    .addOnSuccessListener(o -> {
-                        System.out.println("Success");
+      try {
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(bytes);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
 
-                        AsyncTask.execute(() -> {
-                            try {
-                                Uri url = Tasks.await(imageRef.getDownloadUrl());
+      UploadTask task = imageRef.putFile(Uri.fromFile(file));
 
-                                Log.e("imageRefURI", "" + url.toString());
+      task.addOnFailureListener(o -> System.out.println("Failure"))
+          .addOnSuccessListener(
+              o -> {
+                System.out.println("Success");
 
+                AsyncTask.execute(
+                    () -> {
+                      try {
+                        Uri url = Tasks.await(imageRef.getDownloadUrl());
 
-                                new GetImageText(TestAzureActivity.this).execute(readURI, url.toString(), null, "");
+                        Log.e("imageRefURI", "" + url.toString());
 
-                            } catch (ExecutionException | InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        });
+                        new GetImageText(TestAzureActivity.this)
+                            .execute(readURI, url.toString(), null, "");
 
-
+                      } catch (ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                      }
                     });
-        }
+              });
     }
+  }
 
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
 
+    inflater.inflate(R.menu.action_bar_menu, menu);
+    return true;
+  }
     private class GetImageText extends AsyncTask<String, Void, String> {
         //private final ProgressDialog dialog;
 
@@ -181,56 +188,35 @@ public class TestAzureActivity extends AppCompatActivity {
                 readConnection.setRequestProperty("Content-Type", "application/json");
                 readConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                // Enable writing
-                readConnection.setDoOutput(true);
+        // Enable writing
+        readConnection.setDoOutput(true);
 
-                // Write the data
-                readConnection.getOutputStream().write(myData.getBytes());
+        // Write the data
+        readConnection.getOutputStream().write(myData.getBytes());
 
-                String outputEndpoint = "";
+        String outputEndpoint = "";
 
-                int response = readConnection.getResponseCode();
-                if (response == 200) {
-                    Log.d("CHECK", "200");
-                } else if (response == 202) {
-                    Log.d("CHECK", "202");
+        int response = readConnection.getResponseCode();
+        if (response == 200) {
+          Log.d("CHECK", "200");
+        } else if (response == 202) {
+          Log.d("CHECK", "202");
 
-                    outputEndpoint = readConnection.getHeaderField("Operation-Location");
+          outputEndpoint = readConnection.getHeaderField("Operation-Location");
 
-                } else {
-                    // Error handling code goes here
-                    Log.e("CHECK", "Failed with " + response);
-                    Log.e("CHECK", "Failed with " + readConnection);
-                }
+        } else {
+          // Error handling code goes here
+          Log.e("CHECK", "Failed with " + response);
+          Log.e("CHECK", "Failed with " + readConnection);
+        }
 
-                Log.d("CHECK", outputEndpoint);
+        Log.d("CHECK", outputEndpoint);
 
+        URL jsonURI = new URL(outputEndpoint);
+        HttpsURLConnection jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
 
-                URL jsonURI = new URL(outputEndpoint);
-                HttpsURLConnection jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
-
-                jsonConnection.setRequestMethod("GET");
-
-                jsonConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
-
-                response = jsonConnection.getResponseCode();
-                if (response == 200) {
-                    boolean parsed = false;
-                    while (!parsed) {
-                        Log.d("CHECKOUT", "200");
-
-                        jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
-
-                        jsonConnection.setRequestMethod("GET");
-
-                        jsonConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
-
-                        InputStream responseBody = jsonConnection.getInputStream();
-                        InputStreamReader responseBodyReader =
-                                new InputStreamReader(responseBody, StandardCharsets.UTF_8);
-                        BufferedReader br = new BufferedReader(responseBodyReader);
-                        StringBuilder sb = new StringBuilder();
-
+        jsonConnection.setRequestMethod("GET");
+        
                         String inputLine;
                         while ((inputLine = br.readLine()) != null) {
                             sb.append(inputLine);
@@ -245,46 +231,76 @@ public class TestAzureActivity extends AppCompatActivity {
                             Thread.sleep(200);
                         }
 
-                    }
-                    Log.d("CHECKOUT", "200");
+        response = jsonConnection.getResponseCode();
+        if (response == 200) {
+          boolean parsed = false;
+          while (!parsed) {
+            Log.d("CHECKOUT", "200");
 
-                    InputStream responseBody = jsonConnection.getInputStream();
-                    InputStreamReader responseBodyReader =
-                            new InputStreamReader(responseBody, StandardCharsets.UTF_8);
-                    BufferedReader br = new BufferedReader(responseBodyReader);
-                    StringBuilder sb = new StringBuilder();
+            jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
 
-                    String inputLine;
-                    while ((inputLine = br.readLine()) != null) {
-                        sb.append(inputLine);
-                        System.out.println(inputLine);
-                    }
+            jsonConnection.setRequestMethod("GET");
 
-                    br.close();
+            jsonConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
 
-                    // System.out.println(sb.toString());
-                    jsonConnection.disconnect();
+            InputStream responseBody = jsonConnection.getInputStream();
+            InputStreamReader responseBodyReader =
+                new InputStreamReader(responseBody, StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(responseBodyReader);
+            StringBuilder sb = new StringBuilder();
 
-                    return sb.toString();
-
-                } else if (response == 202) {
-                    Log.d("CHECKOUT", "202");
-
-                } else {
-                    // Error handling code goes here
-                    Log.e("CHECKOUT", "Failed with " + response);
-                    Log.e("CHECKOUT", "Failed with " + jsonConnection);
-                }
-
-                Log.d("CHECKOUTLENGTH: ", outputEndpoint);
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            String inputLine;
+            while ((inputLine = br.readLine()) != null) {
+              sb.append(inputLine);
+              System.out.println(inputLine);
             }
+            Log.d("CHECKOUT", sb.toString());
+            if (sb.substring(0, Math.min(20, sb.length())).contains("Succeeded")) {
+              parsed = true;
+            } else {
+              jsonConnection.disconnect();
+              jsonConnection.connect();
+              Thread.sleep(50);
+            }
+          }
+          Log.d("CHECKOUT", "200");
 
-            return "";
+          InputStream responseBody = jsonConnection.getInputStream();
+          InputStreamReader responseBodyReader =
+              new InputStreamReader(responseBody, StandardCharsets.UTF_8);
+          BufferedReader br = new BufferedReader(responseBodyReader);
+          StringBuilder sb = new StringBuilder();
+
+          String inputLine;
+          while ((inputLine = br.readLine()) != null) {
+            sb.append(inputLine);
+            System.out.println(inputLine);
+          }
+
+          br.close();
+
+          // System.out.println(sb.toString());
+          jsonConnection.disconnect();
+
+          return sb.toString();
+
+        } else if (response == 202) {
+          Log.d("CHECKOUT", "202");
+        } else {
+          // Error handling code goes here
+          Log.e("CHECKOUT", "Failed with " + response);
+          Log.e("CHECKOUT", "Failed with " + jsonConnection);
         }
 
+        Log.d("CHECKOUTLENGTH: ", outputEndpoint);
+
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return "";
+    }
+    
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -301,4 +317,5 @@ public class TestAzureActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
+  }
 }
