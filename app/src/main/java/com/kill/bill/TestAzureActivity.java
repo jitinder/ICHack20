@@ -147,7 +147,7 @@ public class TestAzureActivity extends AppCompatActivity {
                         Log.e("imageRefURI", "" + url.toString());
 
                         GetImageText executor = new GetImageText();
-                        executor.execute(new Holder(new String[]{readURI, url.toString(), null, ""}, getFilesDir()));
+                        executor.execute(new Holder(new String[]{readURI, url.toString(), null, "", imageToAnalyze.toString()}, getFilesDir()));
 
                       } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
@@ -253,7 +253,7 @@ public class TestAzureActivity extends AppCompatActivity {
             Log.i("CREATING NEW FILE: ", String.valueOf(directory.mkdir()));
           }
 
-          FileOutputStream fos = new FileOutputStream(holders[0].directory + "/output/" + imageToAnalyze.toString() + ".json"); // Tokenise to get only between scanned and .jpg
+          FileOutputStream fos = new FileOutputStream(holders[0].directory + "/output/" + holders[0].strings[4] + ".json"); // Tokenise to get only between scanned and .jpg
           fos.write(sb.toString().getBytes());
 
           return sb.toString();
