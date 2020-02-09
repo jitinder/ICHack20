@@ -148,15 +148,22 @@ public class TestAzureActivity extends AppCompatActivity {
             UploadTask task = imageRef.putFile(Uri.fromFile(file));
 
             task.addOnFailureListener(o -> System.out.println("Failure"))
-                    .addOnSuccessListener(
-                            o -> {
-                                System.out.println("Success");
+                    .addOnSuccessListener(o -> {
+                        System.out.println("Success");
+
+                        AsyncTask.execute(() -> {
+                            try {
+                                Uri url = Tasks.await(imageRef.getDownloadUrl());
+                                url = Uri.parse("https://media-cdn.tripadvisor.com/media/photo-s/0e/4a/68/50/receipt.jpg");
+
+                                Log.e("imageRefURI", "" + url.toString());
 
                                 AsyncTask.execute(
                                         () -> {
                                             try {
                                                 Uri url = Tasks.await(imageRef.getDownloadUrl());
 
+                                AsyncTask jsonTask = new GetImageText(TestAzureActivity.this).execute(readURI, url.toString(), null, "");
                                                 Log.e("imageRefURI", "" + url.toString());
 
                                                 GetImageText executor = new GetImageText();
@@ -190,7 +197,8 @@ public class TestAzureActivity extends AppCompatActivity {
     }
 
   private class GetImageText extends AsyncTask<Holder, Void, String> {
-
+        private String json = "";
+    
         @Override
         protected String doInBackground(Holder... holders) {
             try {
@@ -241,6 +249,39 @@ public class TestAzureActivity extends AppCompatActivity {
 
                 response = jsonConnection.getResponseCode();
                 if (response == 200) {
+                    boolean parsed = false;
+                    while (!parsed) {
+                        Log.d("CHECKOUT", "200");
+
+                        jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
+
+                        jsonConnection.setRequestMethod("GET");
+
+                        jsonConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
+
+                        InputStream responseBody = jsonConnection.getInputStream();
+                        InputStreamReader responseBodyReader =
+                                new InputStreamReader(responseBody, StandardCharsets.UTF_8);
+                        BufferedReader br = new BufferedReader(responseBodyReader);
+                        StringBuilder sb = new StringBuilder();
+
+                        String inputLine;
+                        while ((inputLine = br.readLine()) != null) {
+                            sb.append(inputLine);
+                            System.out.println(inputLine);
+                        }
+                        Log.d("CHECKOUT", sb.toString());
+                        json = sb.toString();
+                        if (sb.substring(0, Math.min(20, sb.length())).contains("Succeeded")) {
+                            parsed = true;
+                        } else {
+                            jsonConnection.disconnect();
+                            jsonConnection.connect();
+                            Thread.sleep(200);
+                        }
+
+                    }
+                  
                     Log.d("CHECKOUT", "200");
 
                     InputStream responseBody = jsonConnection.getInputStream();
@@ -302,6 +343,7 @@ public class TestAzureActivity extends AppCompatActivity {
             // dialog.dismiss();
             System.out.println("Payload: " + s);
             Intent intent = new Intent(TestAzureActivity.this, PayLoadParser.class);
+            intent.putExtra("json", json);
             startActivity(intent);
         }
     }
