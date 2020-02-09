@@ -77,13 +77,6 @@ public class TestAzureActivity extends AppCompatActivity {
                     Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
                     this.startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
                 });
-
-        Button goToPayload = findViewById(R.id.go_to_payload);
-        goToPayload.setOnClickListener(
-                view -> {
-                    Intent intent = new Intent(view.getContext(), PayLoadParser.class);
-                    startActivity(intent);
-                });
     }
 
     @Override
