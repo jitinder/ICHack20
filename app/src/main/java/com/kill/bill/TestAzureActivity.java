@@ -1,7 +1,5 @@
 package com.kill.bill;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -9,14 +7,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+
+import android.view.Menu;
+import android.view.MenuInflater;
+
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -34,19 +37,29 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class TestAzureActivity extends AppCompatActivity {
 
-  private static final String subscriptionKey = System.getenv("COMPUTER_VISION_SUBSCRIPTION_KEY");
-  private static final String endpoint = ("COMPUTER_VISION_ENDPOINT");
+  private static final String subscriptionKey = "87e56323493740c7a179825fa8cfc9ed";
+  private static final String endpoint =
+      "https://killbillcomputervision.cognitiveservices.azure.com/";
 
   private static final int REQUEST_IMAGE_CAPTURE = 1;
 
   private static Uri imageToAnalyze;
 
   private static final String readURI = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
+
+  public void onClick2(View v){
+    startActivity(new Intent(this, TransactionList.class));
+  }
+  public void onClick3(View v){
+    startActivity(new Intent(this, TransactionDetails.class));
+  }
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +69,10 @@ public class TestAzureActivity extends AppCompatActivity {
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
     setContentView(R.layout.activity_test_azure);
 
-    Log.e("SUBKEY", "" + subscriptionKey);
+    Toolbar toolbar = findViewById(R.id.azure_toolbar);
+    setSupportActionBar(toolbar);
 
-    new GetImageText(this).execute(readURI, null, "");
+    Log.e("SUBKEY", "" + subscriptionKey);
 
     Button takeImageButton = findViewById(R.id.take_picture_button);
     takeImageButton.setOnClickListener(
@@ -77,14 +91,6 @@ public class TestAzureActivity extends AppCompatActivity {
         });
   }
 
-  public void onClick2(View v){
-    startActivity(new Intent(this, TransactionList.class));
-  }
-  public void onClick3(View v){
-    startActivity(new Intent(this, TransactionDetails.class));
-  }
-
-
   @Override
   protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
@@ -96,20 +102,25 @@ public class TestAzureActivity extends AppCompatActivity {
         return;
       }
 
+      Intent intent = new Intent(TestAzureActivity.this, Splash.class);
+      intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+      startActivity(intent);
+
       bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
 
-      ((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
+      // ((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
 
       SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
 
       imageToAnalyze = Uri.parse(sdf.format(Calendar.getInstance().getTime()));
 
       File file;
+      String prefix = imageToAnalyze.toString();
 
       try {
-        file =
-            File.createTempFile(
-                "/scanned_picture:" + imageToAnalyze.toString(), ".jpg", getFilesDir());
+        File outputDir = TestAzureActivity.this.getCacheDir(); // context being the Activity pointer
+
+        file = File.createTempFile(prefix, "jpg", outputDir);
       } catch (IOException e) {
         e.printStackTrace();
         return;
@@ -139,27 +150,62 @@ public class TestAzureActivity extends AppCompatActivity {
       UploadTask task = imageRef.putFile(Uri.fromFile(file));
 
       task.addOnFailureListener(o -> System.out.println("Failure"))
-          .addOnSuccessListener(o -> System.out.println("Success"));
+          .addOnSuccessListener(
+              o -> {
+                System.out.println("Success");
+
+                AsyncTask.execute(
+                    () -> {
+                      try {
+                        Uri url = Tasks.await(imageRef.getDownloadUrl());
+
+                        Log.e("imageRefURI", "" + url.toString());
+
+                        GetImageText executor = new GetImageText();
+                        executor.execute(new Holder(new String[]{readURI, url.toString(), null, "", imageToAnalyze.toString()}, getFilesDir()));
+
+                      } catch (ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                      }
+                    });
+              });
     }
   }
 
-  private static class GetImageText extends AsyncTask<String, Void, String> {
-    private final ProgressDialog dialog;
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
 
-    public GetImageText(Activity activity) {
-      this.dialog = new ProgressDialog(activity);
+    inflater.inflate(R.menu.action_bar_menu, menu);
+
+    return true;
+  }
+
+  private static class Holder {
+    private String[] strings;
+    private File directory;
+
+    public Holder(String[] strings, File directory) {
+      this.strings = strings;
+      this.directory = directory;
     }
+  }
+
+  private static class GetImageText extends AsyncTask<Holder, Void, String> {
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected String doInBackground(Holder... holders) {
       try {
-        URL readURI = new URL(strings[0]);
+        URL readURI = new URL(holders[0].strings[0]);
         HttpsURLConnection readConnection = (HttpsURLConnection) readURI.openConnection();
+
+        imageToAnalyze = Uri.parse(holders[0].strings[1]);
 
         String myData = "{\"url\":\"" + imageToAnalyze + "\"}";
 
         readConnection.setRequestMethod("POST");
         readConnection.setRequestProperty("Content-Type", "application/json");
+        readConnection.setRequestProperty("X_HTTP_Method-Override", "PATCH");
         readConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
 
         // Enable writing
@@ -216,6 +262,15 @@ public class TestAzureActivity extends AppCompatActivity {
           // System.out.println(sb.toString());
           jsonConnection.disconnect();
 
+          File directory = new File((holders[0].directory) + "/output");
+
+          if (!directory.exists()) {
+            Log.i("CREATING NEW FILE: ", String.valueOf(directory.mkdir()));
+          }
+
+          FileOutputStream fos = new FileOutputStream(holders[0].directory + "/output/" + holders[0].strings[4] + ".json"); // Tokenise to get only between scanned and .jpg
+          fos.write(sb.toString().getBytes());
+
           return sb.toString();
 
         } else if (response == 202) {
@@ -239,15 +294,17 @@ public class TestAzureActivity extends AppCompatActivity {
     @Override
     protected void onPreExecute() {
       super.onPreExecute();
-      dialog.setMessage("Analysing your receipt");
-      dialog.show();
+      // dialog.setMessage("Analysing your receipt");
+      // dialog.show();
     }
 
     @Override
     protected void onPostExecute(String s) {
       super.onPostExecute(s);
-      dialog.dismiss();
+      // dialog.dismiss();
       System.out.println("Payload: " + s);
+      /*Intent intent = new Intent(TestAzureActivity.this, PayLoadParser.class);
+      startActivity(intent);*/
     }
   }
 }
