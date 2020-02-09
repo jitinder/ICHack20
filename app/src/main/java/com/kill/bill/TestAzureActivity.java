@@ -11,7 +11,6 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -103,8 +102,6 @@ public class TestAzureActivity extends AppCompatActivity {
             try {
                 File outputDir = TestAzureActivity.this.getCacheDir(); // context being the Activity pointer
                 file = File.createTempFile(prefix, "jpg", outputDir);
-//                file = File.createTempFile(
-//                                "/scanned_picture" + imageToAnalyze.toString().replaceAll(":",""), ".jpg");
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
@@ -137,22 +134,17 @@ public class TestAzureActivity extends AppCompatActivity {
                     .addOnSuccessListener(o -> {
                         System.out.println("Success");
 
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Uri url = Tasks.await(imageRef.getDownloadUrl());
+                        AsyncTask.execute(() -> {
+                            try {
+                                Uri url = Tasks.await(imageRef.getDownloadUrl());
 
-                                    Log.e("imageRefURI", "" + url.toString());
+                                Log.e("imageRefURI", "" + url.toString());
 
 
-                                    new GetImageText(TestAzureActivity.this).execute(readURI, url.toString(), null, "");
+                                new GetImageText(TestAzureActivity.this).execute(readURI, url.toString(), null, "");
 
-                                } catch (ExecutionException e) {
-                                    e.printStackTrace();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                            } catch (ExecutionException | InterruptedException e) {
+                                e.printStackTrace();
                             }
                         });
 

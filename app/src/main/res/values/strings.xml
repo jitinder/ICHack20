@@ -7,4 +7,5 @@
     <string name="payload_parser">Payload Parser</string>
     <string name="list_of_transactions">List of Transactions</string>
     <string name="random">Random</string>
+    <string name="your_transactions">YOUR TRANSACTIONS</string>
 </resources>
