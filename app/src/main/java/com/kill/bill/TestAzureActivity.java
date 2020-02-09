@@ -146,9 +146,11 @@ public class TestAzureActivity extends AppCompatActivity {
 
                         Log.e("imageRefURI", "" + url.toString());
 
-                        new GetImageText().execute(readURI, url.toString(), null, "");
+                        String log = new GetImageText().execute(readURI, url.toString(), null, "").get();
 
-                      } catch (ExecutionException | InterruptedException e) {
+                        FileOutputStream fos = new FileOutputStream(getFilesDir() + "/output/" + imageToAnalyze.toString() + ".json");
+                        fos.write(log.getBytes());
+                      } catch (ExecutionException | InterruptedException | IOException e) {
                         e.printStackTrace();
                       }
                     });
