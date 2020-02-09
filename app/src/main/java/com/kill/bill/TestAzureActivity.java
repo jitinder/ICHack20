@@ -11,7 +11,6 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,7 +44,7 @@ public class TestAzureActivity extends AppCompatActivity {
 
   private static Uri imageToAnalyze;
 
-  private static final String readURI = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
+  private static final String readURI = endpoint + "/vision/v2.1/read/core/asyncBatchAnalyze";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +89,6 @@ public class TestAzureActivity extends AppCompatActivity {
       }
 
       bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
-
-      ((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
 
       SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
 
@@ -205,6 +202,8 @@ public class TestAzureActivity extends AppCompatActivity {
           }
 
           br.close();
+
+          Log.i("STATUS: ", "Scanned");
 
           // System.out.println(sb.toString());
           jsonConnection.disconnect();
