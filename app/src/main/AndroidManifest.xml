@@ -9,17 +9,21 @@
     <uses-permission
         android:name="android.permission.INTERNET"
         android:required="true" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:required="true" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TransactionDetails"></activity>
+        <activity android:name=".TransactionDetails" />
         <activity android:name=".ListItem" />
         <activity android:name=".TransactionList" />
+        <activity android:name=".PayLoadParser" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -34,28 +38,16 @@
         <activity android:name=".Splash" />
         <activity android:name=".TestAzureActivity">
 
-            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
-        </activity>
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-
                 <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".ScanActivity" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+        </activity>
     </application>
 
 </manifest>

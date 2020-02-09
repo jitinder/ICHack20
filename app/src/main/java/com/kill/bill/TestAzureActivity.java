@@ -1,22 +1,40 @@
 package com.kill.bill;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.util.concurrent.ExecutionException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.Objects;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class TestAzureActivity extends AppCompatActivity {
 
@@ -25,97 +43,204 @@ public class TestAzureActivity extends AppCompatActivity {
 
   private static final int REQUEST_IMAGE_CAPTURE = 1;
 
-  private Uri imageUri;
+  private static Uri imageToAnalyze;
 
-  private static final String uriBase = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
-
-  private static final String imageToAnalyze = "https://i.imgur.com/TQXB8ds.jpg";
+  private static final String readURI = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_test_azure);
 
-    /*Retrofit retrofit =
-        new Retrofit.Builder()
-            .baseUrl("https://api.imgur.com/3/image")
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();*/
+    Log.e("SUBKEY", "" + subscriptionKey);
 
-    Button takeImageButton = findViewById(R.id.takePictureButton);
+    new GetImageText(this).execute(readURI, null, "");
+
+    Button takeImageButton = findViewById(R.id.take_picture_button);
     takeImageButton.setOnClickListener(
         view -> {
           StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
           StrictMode.setVmPolicy(builder.build());
-          takePhoto();
-          galleryAddPic();
+          Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+          this.startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+        });
+
+    Button goToPayload = findViewById(R.id.go_to_payload);
+    goToPayload.setOnClickListener(
+        view -> {
+          Intent intent = new Intent(view.getContext(), PayLoadParser.class);
+          startActivity(intent);
         });
   }
 
-  public void takePhoto() {
-    Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-    //File photo = new File(Environment.getExternalStorageDirectory(), "Pic.jpg");
-
-    //imageUri = Uri.fromFile(photo);
-    //intent.putExtra(MediaStore.EXTRA_OUTPUT, this.imageUri);
-
-    this.startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+  public void onClick2(View v){
+    startActivity(new Intent(this, TransactionList.class));
   }
 
+
   @Override
-  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+  protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
 
-    /* If scanning image */
-    if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-      /* Gets bitmap from intent */
-      Bundle extras = data != null ? data.getExtras() : null;
-      Bitmap image = (Bitmap) (extras != null ? extras.get("data") : null);
+    if (requestCode == REQUEST_IMAGE_CAPTURE) {
+      Bitmap bm;
 
-      /* Display bitmap onscreen */
-      //((ImageView) findViewById(R.id.image)).setImageBitmap(image);
-
-      if (image != null) {
-        /* Buffer for storing bytes from bitmap*/
-        int size = image.getRowBytes() * image.getHeight();
-        ByteBuffer buffer = ByteBuffer.allocate(size);
-        byte[] array;
-
-        /* Builds Firebase Blob from byte[] */
-        image.copyPixelsToBuffer(buffer);
-        array = buffer.array();
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference();
-        StorageReference imageRef = storageReference.child("scanned_images/pic.jpg");
-
-        try {
-          AsyncTask.execute(() -> {
-            try {
-              Tasks.await(imageRef.putBytes(array));
-            } catch (ExecutionException | InterruptedException e) {
-              e.printStackTrace();
-            }
-          });
-
-          Uri downloadUri = imageRef.getDownloadUrl().getResult();
-          System.out.println(downloadUri != null ? downloadUri.toString() : null);
-        } catch (Exception e) {
-          System.out.println("This is fun");
-          e.printStackTrace();
-        }
+      if (data == null || data.getExtras() == null) {
+        return;
       }
+
+      bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
+
+      ((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
+
+      SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
+
+      imageToAnalyze = Uri.parse(sdf.format(Calendar.getInstance().getTime()));
+
+      File file;
+
+      try {
+        file =
+            File.createTempFile(
+                "/scanned_picture:" + imageToAnalyze.toString(), ".jpg", getFilesDir());
+      } catch (IOException e) {
+        e.printStackTrace();
+        return;
+      }
+
+      FirebaseStorage storage = FirebaseStorage.getInstance();
+      StorageReference storageReference = storage.getReference();
+      StorageReference imageRef =
+          storageReference.child("scanned/" + imageToAnalyze.toString() + ".jpg");
+
+      ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+      if (bm == null) {
+        return;
+      }
+
+      bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+      byte[] bytes = stream.toByteArray();
+
+      try {
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(bytes);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+      UploadTask task = imageRef.putFile(Uri.fromFile(file));
+
+      task.addOnFailureListener(o -> System.out.println("Failure"))
+          .addOnSuccessListener(o -> System.out.println("Success"));
     }
   }
 
-  private void galleryAddPic() {
-    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-    File f = new File(String.valueOf(imageUri));
-    Uri contentUri = Uri.fromFile(f);
+  private static class GetImageText extends AsyncTask<String, Void, String> {
+    private final ProgressDialog dialog;
 
-    mediaScanIntent.setData(contentUri);
+    public GetImageText(Activity activity) {
+      this.dialog = new ProgressDialog(activity);
+    }
 
-    this.sendBroadcast(mediaScanIntent);
+    @Override
+    protected String doInBackground(String... strings) {
+      try {
+        URL readURI = new URL(strings[0]);
+        HttpsURLConnection readConnection = (HttpsURLConnection) readURI.openConnection();
+
+        String myData = "{\"url\":\"" + imageToAnalyze + "\"}";
+
+        readConnection.setRequestMethod("POST");
+        readConnection.setRequestProperty("Content-Type", "application/json");
+        readConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
+
+        // Enable writing
+        readConnection.setDoOutput(true);
+
+        // Write the data
+        readConnection.getOutputStream().write(myData.getBytes());
+
+        String outputEndpoint = "";
+
+        int response = readConnection.getResponseCode();
+        if (response == 200) {
+          Log.d("CHECK", "200");
+        } else if (response == 202) {
+          Log.d("CHECK", "202");
+
+          outputEndpoint = readConnection.getHeaderField("Operation-Location");
+
+        } else {
+          // Error handling code goes here
+          Log.e("CHECK", "Failed with " + response);
+          Log.e("CHECK", "Failed with " + readConnection);
+        }
+
+        Log.d("CHECK", outputEndpoint);
+
+        Thread.sleep(2000);
+
+        URL jsonURI = new URL(outputEndpoint);
+        HttpsURLConnection jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
+
+        jsonConnection.setRequestMethod("GET");
+
+        jsonConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
+
+        response = jsonConnection.getResponseCode();
+        if (response == 200) {
+          Log.d("CHECKOUT", "200");
+
+          InputStream responseBody = jsonConnection.getInputStream();
+          InputStreamReader responseBodyReader =
+              new InputStreamReader(responseBody, StandardCharsets.UTF_8);
+          BufferedReader br = new BufferedReader(responseBodyReader);
+          StringBuilder sb = new StringBuilder();
+
+          String inputLine;
+          while ((inputLine = br.readLine()) != null) {
+            sb.append(inputLine);
+            System.out.println(inputLine);
+          }
+
+          br.close();
+
+          // System.out.println(sb.toString());
+          jsonConnection.disconnect();
+
+          return sb.toString();
+
+        } else if (response == 202) {
+          Log.d("CHECKOUT", "202");
+
+        } else {
+          // Error handling code goes here
+          Log.e("CHECKOUT", "Failed with " + response);
+          Log.e("CHECKOUT", "Failed with " + jsonConnection);
+        }
+
+        Log.d("CHECKOUTLENGTH: ", outputEndpoint);
+
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      return "";
+    }
+
+    @Override
+    protected void onPreExecute() {
+      super.onPreExecute();
+      dialog.setMessage("Analysing your receipt");
+      dialog.show();
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+      super.onPostExecute(s);
+      dialog.dismiss();
+      System.out.println("Payload: " + s);
+    }
   }
 }

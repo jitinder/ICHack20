@@ -2,5 +2,8 @@
     <string name="app_name">KillBill</string>
     <string name="scan">Scan</string>
     <string name="scan_image">Scanned Image</string>
-    <string name="go_scan">Let\'s Scan!</string>
+    <string name="take_picture">Take Picture</string>
+    <string name="upload">Upload</string>
+    <string name="payload_parser">Payload Parser</string>
+    <string name="list_of_transactions">List of Transactions</string>
 </resources>
