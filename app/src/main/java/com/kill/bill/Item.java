@@ -1,5 +1,6 @@
 package com.kill.bill;
 
+@SuppressWarnings("unused")
 public class Item {
     private String name;
     private double price;
