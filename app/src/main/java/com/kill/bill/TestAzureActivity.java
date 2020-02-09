@@ -90,6 +90,11 @@ public class TestAzureActivity extends AppCompatActivity {
 
             bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
 
+
+            Intent intent = new Intent(TestAzureActivity.this, Splash.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
+
             //((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
@@ -237,7 +242,7 @@ public class TestAzureActivity extends AppCompatActivity {
                         } else {
                             jsonConnection.disconnect();
                             jsonConnection.connect();
-                            Thread.sleep(50);
+                            Thread.sleep(200);
                         }
 
                     }
@@ -285,8 +290,6 @@ public class TestAzureActivity extends AppCompatActivity {
             super.onPreExecute();
             //dialog.setMessage("Analysing your receipt");
             //dialog.show();
-            Intent intent = new Intent(TestAzureActivity.this, Splash.class);
-            startActivity(intent);
         }
 
         @Override
@@ -294,7 +297,7 @@ public class TestAzureActivity extends AppCompatActivity {
             super.onPostExecute(s);
             //dialog.dismiss();
             System.out.println("Payload: " + s);
-            Intent intent = new Intent(TestAzureActivity.this, TransactionList.class);
+            Intent intent = new Intent(TestAzureActivity.this, PayLoadParser.class);
             startActivity(intent);
         }
     }
