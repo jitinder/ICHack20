@@ -14,6 +14,7 @@
         android:background="@drawable/split_button"
         android:fontFamily="@font/prompt_medium"
         android:gravity="top"
+        android:onClick="onClick"
         android:text="Back to Transactions"
         android:textAlignment="center"
         android:textSize="20dp"

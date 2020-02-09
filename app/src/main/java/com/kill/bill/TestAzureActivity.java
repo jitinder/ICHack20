@@ -76,6 +76,9 @@ public class TestAzureActivity extends AppCompatActivity {
   public void onClick2(View v){
     startActivity(new Intent(this, TransactionList.class));
   }
+  public void onClick3(View v){
+    startActivity(new Intent(this, TransactionDetails.class));
+  }
 
 
   @Override
