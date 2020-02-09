@@ -42,7 +42,7 @@ public class TestAzureActivity extends AppCompatActivity {
 
   private static final int REQUEST_IMAGE_CAPTURE = 1;
 
-  private static final String imageToAnalyze = "https://i.imgur.com/TQXB8ds.jpg";
+  private static Uri imageToAnalyze;
 
   private static final String readURI = endpoint + "vision/v2.1/read/core/asyncBatchAnalyze";
 
@@ -89,13 +89,14 @@ public class TestAzureActivity extends AppCompatActivity {
 
       SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
 
-      Uri imageUri = Uri.parse(sdf.format(Calendar.getInstance().getTime()));
+      imageToAnalyze = Uri.parse(sdf.format(Calendar.getInstance().getTime()));
 
       File file;
 
       try {
         file =
-            File.createTempFile("/scanned_picture:" + imageUri.toString(), ".jpg", getFilesDir());
+            File.createTempFile(
+                "/scanned_picture:" + imageToAnalyze.toString(), ".jpg", getFilesDir());
       } catch (IOException e) {
         e.printStackTrace();
         return;
@@ -103,7 +104,8 @@ public class TestAzureActivity extends AppCompatActivity {
 
       FirebaseStorage storage = FirebaseStorage.getInstance();
       StorageReference storageReference = storage.getReference();
-      StorageReference imageRef = storageReference.child("scanned/" + imageUri.toString() + ".jpg");
+      StorageReference imageRef =
+          storageReference.child("scanned/" + imageToAnalyze.toString() + ".jpg");
 
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
