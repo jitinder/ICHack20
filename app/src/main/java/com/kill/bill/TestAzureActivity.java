@@ -56,8 +56,6 @@ public class TestAzureActivity extends AppCompatActivity {
 
         Log.e("SUBKEY", "" + subscriptionKey);
 
-        new GetImageText(this).execute(readURI, null, "");
-
         Button takeImageButton = findViewById(R.id.take_picture_button);
         takeImageButton.setOnClickListener(
                 view -> {
@@ -93,18 +91,20 @@ public class TestAzureActivity extends AppCompatActivity {
 
             bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
 
-            ((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
+            //((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.ENGLISH);
 
             imageToAnalyze = Uri.parse(sdf.format(Calendar.getInstance().getTime()));
 
             File file;
+            String prefix = imageToAnalyze.toString();
 
             try {
-                file =
-                        File.createTempFile(
-                                "/scanned_picture:" + imageToAnalyze.toString(), ".jpg", getFilesDir());
+                File outputDir = TestAzureActivity.this.getCacheDir(); // context being the Activity pointer
+                file = File.createTempFile(prefix, "jpg", outputDir);
+//                file = File.createTempFile(
+//                                "/scanned_picture" + imageToAnalyze.toString().replaceAll(":",""), ".jpg");
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
@@ -136,18 +136,31 @@ public class TestAzureActivity extends AppCompatActivity {
             task.addOnFailureListener(o -> System.out.println("Failure"))
                     .addOnSuccessListener(o -> {
                         System.out.println("Success");
-                        try {
-                            Uri url = Tasks.await(imageRef.getDownloadUrl());
 
-                            Log.e("imageRefURI", "" + url.toString());
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Uri url = Tasks.await(imageRef.getDownloadUrl());
+
+                                    Log.e("imageRefURI", "" + url.toString());
+
+
+                                    new GetImageText(TestAzureActivity.this).execute(readURI, url.toString(), null, "");
+
+                                } catch (ExecutionException e) {
+                                    e.printStackTrace();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+
                     });
         }
     }
+
 
     private static class GetImageText extends AsyncTask<String, Void, String> {
         private final ProgressDialog dialog;
@@ -162,7 +175,7 @@ public class TestAzureActivity extends AppCompatActivity {
                 URL readURI = new URL(strings[0]);
                 HttpsURLConnection readConnection = (HttpsURLConnection) readURI.openConnection();
 
-                imageToAnalyze = Uri.parse("https://i.imgur.com/TQXB8ds.jpg");
+                imageToAnalyze = Uri.parse(strings[1]);
 
                 String myData = "{\"url\":\"" + imageToAnalyze + "\"}";
 
@@ -195,7 +208,6 @@ public class TestAzureActivity extends AppCompatActivity {
                 Log.d("CHECK", outputEndpoint);
 
 
-
                 URL jsonURI = new URL(outputEndpoint);
                 HttpsURLConnection jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
 
@@ -206,7 +218,7 @@ public class TestAzureActivity extends AppCompatActivity {
                 response = jsonConnection.getResponseCode();
                 if (response == 200) {
                     boolean parsed = false;
-                    while (!parsed){
+                    while (!parsed) {
                         Log.d("CHECKOUT", "200");
 
                         jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
@@ -227,10 +239,9 @@ public class TestAzureActivity extends AppCompatActivity {
                             System.out.println(inputLine);
                         }
                         Log.d("CHECKOUT", sb.toString());
-                        if (sb.substring(0,Math.min(20, sb.length())).contains("Succeeded")){
-                            parsed=true;
-                        }
-                        else{
+                        if (sb.substring(0, Math.min(20, sb.length())).contains("Succeeded")) {
+                            parsed = true;
+                        } else {
                             jsonConnection.disconnect();
                             jsonConnection.connect();
                             Thread.sleep(50);
