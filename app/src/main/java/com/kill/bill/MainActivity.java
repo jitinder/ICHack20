@@ -18,4 +18,8 @@ public class MainActivity extends AppCompatActivity {
     /* Switch to ScanActivity */
     startActivity(new Intent(this, Splash.class));
   }
+
+  public void onClick2(View v){
+    startActivity(new Intent(this, TransactionList.class));
+  }
 }
