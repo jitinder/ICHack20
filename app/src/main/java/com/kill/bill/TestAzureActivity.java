@@ -146,11 +146,10 @@ public class TestAzureActivity extends AppCompatActivity {
 
                         Log.e("imageRefURI", "" + url.toString());
 
-                        String log = new GetImageText().execute(readURI, url.toString(), null, "").get();
+                        GetImageText executor = new GetImageText();
+                        executor.execute(new Holder(new String[]{readURI, url.toString(), null, ""}, getFilesDir()));
 
-                        FileOutputStream fos = new FileOutputStream(getFilesDir() + "/output/" + imageToAnalyze.toString() + ".json");
-                        fos.write(log.getBytes());
-                      } catch (ExecutionException | InterruptedException | IOException e) {
+                      } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                       }
                     });
@@ -167,18 +166,31 @@ public class TestAzureActivity extends AppCompatActivity {
     return true;
   }
 
-  private static class GetImageText extends AsyncTask<String, Void, String> {
+  private static class Holder {
+    private String[] strings;
+    private File directory;
+
+    public Holder(String[] strings, File directory) {
+      this.strings = strings;
+      this.directory = directory;
+    }
+  }
+
+  private static class GetImageText extends AsyncTask<Holder, Void, String> {
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected String doInBackground(Holder... holders) {
       try {
-        URL readURI = new URL(strings[0]);
+        URL readURI = new URL(holders[0].strings[0]);
         HttpsURLConnection readConnection = (HttpsURLConnection) readURI.openConnection();
+
+        imageToAnalyze = Uri.parse(holders[0].strings[1]);
 
         String myData = "{\"url\":\"" + imageToAnalyze + "\"}";
 
         readConnection.setRequestMethod("POST");
         readConnection.setRequestProperty("Content-Type", "application/json");
+        readConnection.setRequestProperty("X_HTTP_Method-Override", "PATCH");
         readConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
 
         // Enable writing
@@ -234,6 +246,15 @@ public class TestAzureActivity extends AppCompatActivity {
 
           // System.out.println(sb.toString());
           jsonConnection.disconnect();
+
+          File directory = new File((holders[0].directory) + "/output");
+
+          if (!directory.exists()) {
+            Log.i("CREATING NEW FILE: ", String.valueOf(directory.mkdir()));
+          }
+
+          FileOutputStream fos = new FileOutputStream(holders[0].directory + "/output/" + imageToAnalyze.toString() + ".json"); // Tokenise to get only between scanned and .jpg
+          fos.write(sb.toString().getBytes());
 
           return sb.toString();
 
