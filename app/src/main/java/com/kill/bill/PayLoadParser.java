@@ -1,5 +1,8 @@
 package com.kill.bill;
 
+import android.os.Bundle;
+import android.widget.ListView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.JsonArray;
@@ -11,24 +14,21 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
-import java.util.ArrayList;
 
 public class PayLoadParser extends AppCompatActivity {
-
-  private final List<Item> items;
+  private List<Item> items;
+  private ListView listView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_pay_load_parser);
-    
+
     this.items = new ArrayList<>();
-    
+
     ItemAdapter itemAdapter = new ItemAdapter(this, items);
+
+    listView = findViewById(R.id.payload_items);
     listView.setAdapter(itemAdapter);
 
     try {
@@ -39,7 +39,7 @@ public class PayLoadParser extends AppCompatActivity {
       System.out.println("JSON Exception");
     }
   }
-  
+
   private void parseJSON(String filename) {
     JsonObject root;
     JsonParser parser = new JsonParser();
@@ -66,5 +66,6 @@ public class PayLoadParser extends AppCompatActivity {
         item.setName(lineData.toString());
         this.items.add(item);
       }
-   }
+    }
+  }
 }
