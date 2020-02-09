@@ -22,11 +22,12 @@ public class PersonAdapter extends ArrayAdapter<String> {
     super(context, 0, names);
   }
 
+  /*
   @Override
   @NonNull
   public View getView(int position, View convertView, @NonNull ViewGroup parent) {
       String item = getItem(position);
-/*
+
     if (convertView == null) {
       convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_items, parent, false);
     }
@@ -103,7 +104,8 @@ public class PersonAdapter extends ArrayAdapter<String> {
         intent.putExtra("item", item);
         parent.getContext().startActivity(intent);
     });
-*/
+
     return convertView;
   }
+ */
 }

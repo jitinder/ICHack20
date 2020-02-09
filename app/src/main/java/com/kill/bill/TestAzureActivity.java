@@ -142,6 +142,7 @@ public class TestAzureActivity extends AppCompatActivity {
                         AsyncTask.execute(() -> {
                             try {
                                 Uri url = Tasks.await(imageRef.getDownloadUrl());
+                                url = Uri.parse("https://media-cdn.tripadvisor.com/media/photo-s/0e/4a/68/50/receipt.jpg");
 
                                 Log.e("imageRefURI", "" + url.toString());
 
