@@ -89,6 +89,10 @@ public class TestAzureActivity extends AppCompatActivity {
         return;
       }
 
+            Intent intent = new Intent(TestAzureActivity.this, Splash.class);
+            intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivity(intent);
+
       bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
 
       // ((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
@@ -160,30 +164,29 @@ public class TestAzureActivity extends AppCompatActivity {
     MenuInflater inflater = getMenuInflater();
 
     inflater.inflate(R.menu.action_bar_menu, menu);
-
     return true;
   }
+    private class GetImageText extends AsyncTask<String, Void, String> {
+        //private final ProgressDialog dialog;
 
-  private static class GetImageText extends AsyncTask<String, Void, String> {
-    private final ProgressDialog dialog;
+        public GetImageText(Activity activity) {
+            //this.dialog = new ProgressDialog(activity);
 
-    public GetImageText(Activity activity) {
-      this.dialog = new ProgressDialog(activity);
-    }
+        }
 
-    @Override
-    protected String doInBackground(String... strings) {
-      try {
-        URL readURI = new URL(strings[0]);
-        HttpsURLConnection readConnection = (HttpsURLConnection) readURI.openConnection();
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                URL readURI = new URL(strings[0]);
+                HttpsURLConnection readConnection = (HttpsURLConnection) readURI.openConnection();
 
-        imageToAnalyze = Uri.parse(strings[1]);
+                imageToAnalyze = Uri.parse(strings[1]);
 
-        String myData = "{\"url\":\"" + imageToAnalyze + "\"}";
+                String myData = "{\"url\":\"" + imageToAnalyze + "\"}";
 
-        readConnection.setRequestMethod("POST");
-        readConnection.setRequestProperty("Content-Type", "application/json");
-        readConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
+                readConnection.setRequestMethod("POST");
+                readConnection.setRequestProperty("Content-Type", "application/json");
+                readConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
 
         // Enable writing
         readConnection.setDoOutput(true);
@@ -213,8 +216,20 @@ public class TestAzureActivity extends AppCompatActivity {
         HttpsURLConnection jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
 
         jsonConnection.setRequestMethod("GET");
-
-        jsonConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
+        
+                        String inputLine;
+                        while ((inputLine = br.readLine()) != null) {
+                            sb.append(inputLine);
+                            System.out.println(inputLine);
+                        }
+                        Log.d("CHECKOUT", sb.toString());
+                        if (sb.substring(0, Math.min(20, sb.length())).contains("Succeeded")) {
+                            parsed = true;
+                        } else {
+                            jsonConnection.disconnect();
+                            jsonConnection.connect();
+                            Thread.sleep(200);
+                        }
 
         response = jsonConnection.getResponseCode();
         if (response == 200) {
@@ -285,21 +300,22 @@ public class TestAzureActivity extends AppCompatActivity {
 
       return "";
     }
+    
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //dialog.setMessage("Analysing your receipt");
+            //dialog.show();
+        }
 
-
-
-    @Override
-    protected void onPreExecute() {
-      super.onPreExecute();
-      dialog.setMessage("Analysing your receipt");
-      dialog.show();
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-      super.onPostExecute(s);
-      dialog.dismiss();
-      System.out.println("Payload: " + s);
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            //dialog.dismiss();
+            System.out.println("Payload: " + s);
+            Intent intent = new Intent(TestAzureActivity.this, PayLoadParser.class);
+            startActivity(intent);
+        }
     }
   }
 }
