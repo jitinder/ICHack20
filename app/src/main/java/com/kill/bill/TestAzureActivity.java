@@ -162,11 +162,12 @@ public class TestAzureActivity extends AppCompatActivity {
     }
 
 
-    private static class GetImageText extends AsyncTask<String, Void, String> {
-        private final ProgressDialog dialog;
+    private class GetImageText extends AsyncTask<String, Void, String> {
+        //private final ProgressDialog dialog;
 
         public GetImageText(Activity activity) {
-            this.dialog = new ProgressDialog(activity);
+            //this.dialog = new ProgressDialog(activity);
+
         }
 
         @Override
@@ -290,15 +291,19 @@ public class TestAzureActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialog.setMessage("Analysing your receipt");
-            dialog.show();
+            //dialog.setMessage("Analysing your receipt");
+            //dialog.show();
+            Intent intent = new Intent(TestAzureActivity.this, Splash.class);
+            startActivity(intent);
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            dialog.dismiss();
+            //dialog.dismiss();
             System.out.println("Payload: " + s);
+            Intent intent = new Intent(TestAzureActivity.this, TransactionList.class);
+            startActivity(intent);
         }
     }
 }
