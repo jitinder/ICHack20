@@ -7,14 +7,14 @@
     tools:context=".TestAzureActivity">
 
     <Button
-        android:id="@+id/takePictureButton"
+        android:id="@+id/take_picture_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="146dp"
         android:layout_marginTop="54dp"
         android:layout_marginEnd="147dp"
         android:layout_marginBottom="629dp"
-        android:text="Take Picture"
+        android:text="@string/take_picture"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -23,37 +23,36 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:id="@+id/UploadPictureButton"
+        android:id="@+id/upload_picture_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="84dp"
-        android:text="Upload"
+        android:text="@string/upload"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/takePictureButton"
+        app:layout_constraintTop_toBottomOf="@+id/take_picture_button"
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:id="@+id/scanPictureButton"
+        android:id="@+id/scan_picture_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan"
+        android:text="@string/scan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/UploadPictureButton"
+        app:layout_constraintTop_toBottomOf="@+id/upload_picture_button"
         app:layout_constraintVertical_bias="0.269" />
-
     <Button
-        android:id="@+id/gottopayload"
+        android:id="@+id/go_to_payload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Payload Parser"
+        android:text="@string/payload_parser"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
