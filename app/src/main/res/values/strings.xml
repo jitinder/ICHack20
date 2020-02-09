@@ -8,4 +8,7 @@
     <string name="list_of_transactions">List of Transactions</string>
     <string name="random">Random</string>
     <string name="your_transactions">YOUR TRANSACTIONS</string>
+    <string name="background">background</string>
+    <string name="animation">animation</string>
+    <string name="action_settings">settings</string>
 </resources>

@@ -3,7 +3,6 @@ package com.kill.bill;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-@SuppressWarnings("unused")
 public class Item implements Parcelable {
   private String name;
   private double price;
@@ -19,17 +18,18 @@ public class Item implements Parcelable {
     quantity = in.readInt();
   }
 
-  public static final Creator<Item> CREATOR = new Creator<Item>() {
-    @Override
-    public Item createFromParcel(Parcel in) {
-      return new Item(in);
-    }
+  public static final Creator<Item> CREATOR =
+      new Creator<Item>() {
+        @Override
+        public Item createFromParcel(Parcel in) {
+          return new Item(in);
+        }
 
-    @Override
-    public Item[] newArray(int size) {
-      return new Item[size];
-    }
-  };
+        @Override
+        public Item[] newArray(int size) {
+          return new Item[size];
+        }
+      };
 
   public String getName() {
     return name;
