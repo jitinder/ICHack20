@@ -21,11 +21,11 @@ public class TransactionDetails extends AppCompatActivity {
     Bundle args = getIntent().getExtras();
     Item transaction = (Item) Objects.requireNonNull(Objects.requireNonNull(args).get("item"));
 
-    Objects.requireNonNull(getSupportActionBar()).hide();
+    //Objects.requireNonNull(getSupportActionBar()).hide();
 
-    getWindow()
+    /*getWindow()
         .setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
 
     setContentView(R.layout.activity_transaction_details);
   }

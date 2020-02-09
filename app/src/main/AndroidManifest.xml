@@ -20,7 +20,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SelectPeople"></activity>
+        <activity android:name=".ItemSelector"></activity>
+        <activity android:name=".SelectUsers" />
+        <activity android:name=".SelectPeople" />
         <activity android:name=".TransactionDetails" />
         <activity android:name=".ListItem" />
         <activity android:name=".TransactionList" />
