@@ -5,4 +5,5 @@
     <string name="take_picture">Take Picture</string>
     <string name="upload">Upload</string>
     <string name="payload_parser">Payload Parser</string>
+    <string name="list_of_transactions">List of Transactions</string>
 </resources>

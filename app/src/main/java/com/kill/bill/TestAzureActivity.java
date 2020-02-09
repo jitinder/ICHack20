@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -71,6 +72,11 @@ public class TestAzureActivity extends AppCompatActivity {
           startActivity(intent);
         });
   }
+
+  public void onClick2(View v){
+    startActivity(new Intent(this, TransactionList.class));
+  }
+
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

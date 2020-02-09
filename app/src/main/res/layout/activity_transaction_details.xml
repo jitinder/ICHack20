@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TransactionDetails">
+
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/split_button"
+        android:fontFamily="@font/prompt_medium"
+        android:gravity="top"
+        android:text="Back to Transactions"
+        android:textAlignment="center"
+        android:textSize="20dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/seller"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="76dp"
+        android:fontFamily="@font/prompt_medium"
+        android:text="Restaurant Name"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="30dp"
+        app:layout_constraintTop_toBottomOf="@+id/backButton"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/amount"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:fontFamily="@font/prompt_medium"
+        android:text="Amount\n£140.35"
+        android:textAlignment="center"
+        android:textColor="#D61A1F"
+        android:textSize="40dp"
+        app:layout_constraintTop_toBottomOf="@+id/seller"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:fontFamily="@font/prompt_medium"
+        android:text="Date \n 02/07/2020"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="27dp"
+        app:layout_constraintTop_toBottomOf="@+id/amount"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <Button
+        android:id="@+id/splitButton"
+        android:layout_width="171dp"
+        android:layout_height="95dp"
+        android:background="@drawable/split_button"
+        android:fontFamily="@font/prompt_extrabold"
+        android:text="KILL BILL"
+        android:textSize="26dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/date" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
