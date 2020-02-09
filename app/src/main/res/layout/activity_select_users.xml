@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SelectUsers">
+
+    <TextView
+        android:id="@+id/users_textview"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#FCD612"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:text="@string/select_users"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:layout_alignParentTop="true"
+        android:typeface="monospace" />
+
+
+    <ListView
+        android:id="@+id/users_list"
+        android:layout_above="@id/selected_users"
+        android:layout_below="@+id/users_textview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/selected_users"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/yellow_button"
+        android:layout_alignParentBottom="true"
+        android:text="Done"/>
+
+
+</RelativeLayout>

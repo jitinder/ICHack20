@@ -19,17 +19,14 @@ public class TransactionDetails extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-      getSupportActionBar().hide();
-      getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-              WindowManager.LayoutParams.FLAG_FULLSCREEN);
     Bundle args = getIntent().getExtras();
     transaction = (Item) Objects.requireNonNull(Objects.requireNonNull(args).get("item"));
 
-    Objects.requireNonNull(getSupportActionBar()).hide();
+    //Objects.requireNonNull(getSupportActionBar()).hide();
 
-    getWindow()
+    /*getWindow()
         .setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
 
     setContentView(R.layout.activity_transaction_details);
   }

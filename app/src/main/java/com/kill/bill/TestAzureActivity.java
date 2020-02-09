@@ -61,6 +61,9 @@ public class TestAzureActivity extends AppCompatActivity {
         startActivity(new Intent(this, TransactionDetails.class));
     }
 
+    public void onClick4(View v) {
+        startActivity(new Intent(this, SelectUsers.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,11 @@ public class TestAzureActivity extends AppCompatActivity {
                     Intent intent = new Intent(view.getContext(), PayLoadParser.class);
                     startActivity(intent);
                 });
+
+        Button goToUsers = findViewById(R.id.usersbutton);
+        goToUsers.setOnClickListener(
+                this::onClick4
+        );
     }
 
     @Override
