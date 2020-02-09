@@ -43,6 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button3" />
 
+
     <Button
         android:id="@+id/button3"
         android:layout_width="194dp"
@@ -82,17 +83,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/azure_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        android:title="@string/app_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
->>>>>>> 62dde05529c77e16c3716de17fdc04e5fa30d610
 </androidx.constraintlayout.widget.ConstraintLayout>
