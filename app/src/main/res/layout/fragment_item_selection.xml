@@ -19,6 +19,7 @@
         android:typeface="monospace" />
 
     <ListView
+        android:id="@+id/fragment_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

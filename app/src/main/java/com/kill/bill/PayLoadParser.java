@@ -3,6 +3,8 @@ package com.kill.bill;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,7 @@ public class PayLoadParser extends AppCompatActivity {
         this.items = new ArrayList<>();
         this.totals = new ArrayList<>();
 
-        ItemAdapter adapter = new ItemAdapter(this, this.items);
+        ItemAdapter adapter = new ItemAdapter(this, this.items, true);
 
         ListView listView = findViewById(R.id.transactions);
         listView.setAdapter(adapter);
@@ -62,6 +65,18 @@ public class PayLoadParser extends AppCompatActivity {
         }
         textView.setText(textView.getText().toString().substring(0, Math.max(textView.getText().toString().length() - 1, 0)));
 
+
+        Button next = findViewById(R.id.Next);
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), SelectUsers.class);
+                Bundle args = new Bundle();
+                args.putSerializable("ARRAYLIST",(Serializable)items);
+                intent.putExtra("BUNDLE", args);
+                startActivity(intent);
+            }
+        });
     }
 
     private void parseJSON(String filename) {

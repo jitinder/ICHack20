@@ -3,6 +3,7 @@ package com.kill.bill;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,8 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class ItemAdapter extends ArrayAdapter<Item> {
-  public ItemAdapter(Context context, List<Item> items) {
+    boolean showIcon = true;
+  public ItemAdapter(Context context, List<Item> items, boolean showIcon) {
     super(context, 0, items);
   }
 
@@ -35,6 +37,9 @@ public class ItemAdapter extends ArrayAdapter<Item> {
     TextView itemPriceTV = convertView.findViewById(R.id.item_price);
     TextView itemQuantTV = convertView.findViewById(R.id.item_quantity);
     ImageView editValueIV = convertView.findViewById(R.id.edit_item_info);
+    if(!showIcon){
+        editValueIV.setVisibility(View.INVISIBLE);
+    }
 
     if (item != null) {
       itemNameTV.setText(item.getName());

@@ -11,11 +11,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class SelectUsers extends AppCompatActivity {
 
     ArrayList<String> selectedUsers;
+    ArrayList<Item> scannedItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,10 @@ public class SelectUsers extends AppCompatActivity {
         users.add("Tudor");
 
         selectedUsers = new ArrayList<>();
+
+        Intent intent = getIntent();
+        Bundle args = intent.getBundleExtra("BUNDLE");
+        scannedItems = (ArrayList<Item>) args.getSerializable("ARRAYLIST");
 
         ArrayAdapter<String> itemsAdapter =
                 new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, users);
@@ -59,6 +66,9 @@ public class SelectUsers extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ItemSelector.class);
                 intent.putStringArrayListExtra("users", selectedUsers);
+                Bundle args = new Bundle();
+                args.putSerializable("ARRAYLIST",(Serializable)scannedItems);
+                intent.putExtra("BUNDLE", args);
                 startActivity(intent);
             }
         });
