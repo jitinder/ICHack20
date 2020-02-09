@@ -176,7 +176,7 @@ public class TestAzureActivity extends AppCompatActivity {
     }
   }
 
-  private static class GetImageText extends AsyncTask<Holder, Void, String> {
+  private class GetImageText extends AsyncTask<Holder, Void, String> {
 
     @Override
     protected String doInBackground(Holder... holders) {
@@ -288,8 +288,8 @@ public class TestAzureActivity extends AppCompatActivity {
       super.onPostExecute(s);
       // dialog.dismiss();
       System.out.println("Payload: " + s);
-      /*Intent intent = new Intent(TestAzureActivity.this, PayLoadParser.class);
-      startActivity(intent);*/
+      Intent intent = new Intent(TestAzureActivity.this, PayLoadParser.class);
+      startActivity(intent);
     }
   }
 }
