@@ -10,14 +10,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PayLoadParser extends AppCompatActivity {
   private List<Item> items;
-  private ListView listView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +27,10 @@ public class PayLoadParser extends AppCompatActivity {
 
     this.items = new ArrayList<>();
 
-    ItemAdapter itemAdapter = new ItemAdapter(this, items);
+    ItemAdapter adapter = new ItemAdapter(this, this.items);
 
-    listView = findViewById(R.id.payload_items);
-    listView.setAdapter(itemAdapter);
+    ListView listView = findViewById(R.id.transactions);
+    listView.setAdapter(adapter);
 
     try {
       parseJSON("example_1.json");
@@ -45,8 +46,10 @@ public class PayLoadParser extends AppCompatActivity {
     JsonParser parser = new JsonParser();
 
     try {
-      root = parser.parse(new FileReader(filename)).getAsJsonObject();
-    } catch (FileNotFoundException | ClassCastException e) {
+      InputStream stream = getAssets().open(filename);
+      InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+      root = parser.parse(reader).getAsJsonObject();
+    } catch (ClassCastException | IOException e) {
       e.printStackTrace();
       return;
     }
@@ -58,7 +61,7 @@ public class PayLoadParser extends AppCompatActivity {
       JsonArray lines = pageLines.getAsJsonArray("lines");
 
       for (int line = 0; line < lines.size(); line++) {
-        Item item = new Item();
+        Item item = new Item(null);
         JsonElement lineData = lines.get(line).getAsJsonObject().get("text");
 
         System.out.println(lineData);
