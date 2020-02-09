@@ -146,7 +146,7 @@ public class TestAzureActivity extends AppCompatActivity {
                                 Log.e("imageRefURI", "" + url.toString());
 
 
-                                new GetImageText(TestAzureActivity.this).execute(readURI, url.toString(), null, "");
+                                AsyncTask jsonTask = new GetImageText(TestAzureActivity.this).execute(readURI, url.toString(), null, "");
 
                             } catch (ExecutionException | InterruptedException e) {
                                 e.printStackTrace();
@@ -161,6 +161,7 @@ public class TestAzureActivity extends AppCompatActivity {
 
     private class GetImageText extends AsyncTask<String, Void, String> {
         //private final ProgressDialog dialog;
+        private String json = "";
 
         public GetImageText(Activity activity) {
             //this.dialog = new ProgressDialog(activity);
@@ -237,6 +238,7 @@ public class TestAzureActivity extends AppCompatActivity {
                             System.out.println(inputLine);
                         }
                         Log.d("CHECKOUT", sb.toString());
+                        json = sb.toString();
                         if (sb.substring(0, Math.min(20, sb.length())).contains("Succeeded")) {
                             parsed = true;
                         } else {
@@ -298,6 +300,7 @@ public class TestAzureActivity extends AppCompatActivity {
             //dialog.dismiss();
             System.out.println("Payload: " + s);
             Intent intent = new Intent(TestAzureActivity.this, PayLoadParser.class);
+            intent.putExtra("json", json);
             startActivity(intent);
         }
     }
