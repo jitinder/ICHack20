@@ -129,7 +129,7 @@ public class TestAzureActivity extends AppCompatActivity {
   }
 
   private static class GetImageText extends AsyncTask<String, Void, String> {
-    private ProgressDialog dialog;
+    private final ProgressDialog dialog;
 
     public GetImageText(Activity activity) {
       this.dialog = new ProgressDialog(activity);
@@ -212,7 +212,7 @@ public class TestAzureActivity extends AppCompatActivity {
           Log.e("CHECKOUT", "Failed with " + jsonConnection);
         }
 
-        Log.d("CHECKOUTLENGTH", outputEndpoint);
+        Log.d("CHECKOUTLENGTH: ", outputEndpoint);
 
       } catch (Exception e) {
         e.printStackTrace();
