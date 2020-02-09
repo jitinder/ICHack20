@@ -1,7 +1,5 @@
 package com.kill.bill;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -89,6 +87,10 @@ public class TestAzureActivity extends AppCompatActivity {
         return;
       }
 
+      Intent intent = new Intent(TestAzureActivity.this, Splash.class);
+      intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+      startActivity(intent);
+
       bm = (Bitmap) Objects.requireNonNull(data.getExtras()).get("data");
 
       // ((ImageView) findViewById(R.id.image)).setImageBitmap(bm);
@@ -144,8 +146,7 @@ public class TestAzureActivity extends AppCompatActivity {
 
                         Log.e("imageRefURI", "" + url.toString());
 
-                        new GetImageText(TestAzureActivity.this)
-                            .execute(readURI, url.toString(), null, "");
+                        new GetImageText().execute(readURI, url.toString(), null, "");
 
                       } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
@@ -165,19 +166,12 @@ public class TestAzureActivity extends AppCompatActivity {
   }
 
   private static class GetImageText extends AsyncTask<String, Void, String> {
-    private final ProgressDialog dialog;
-
-    public GetImageText(Activity activity) {
-      this.dialog = new ProgressDialog(activity);
-    }
 
     @Override
     protected String doInBackground(String... strings) {
       try {
         URL readURI = new URL(strings[0]);
         HttpsURLConnection readConnection = (HttpsURLConnection) readURI.openConnection();
-
-        imageToAnalyze = Uri.parse(strings[1]);
 
         String myData = "{\"url\":\"" + imageToAnalyze + "\"}";
 
@@ -209,6 +203,8 @@ public class TestAzureActivity extends AppCompatActivity {
 
         Log.d("CHECK", outputEndpoint);
 
+        Thread.sleep(2000);
+
         URL jsonURI = new URL(outputEndpoint);
         HttpsURLConnection jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
 
@@ -218,36 +214,6 @@ public class TestAzureActivity extends AppCompatActivity {
 
         response = jsonConnection.getResponseCode();
         if (response == 200) {
-          boolean parsed = false;
-          while (!parsed) {
-            Log.d("CHECKOUT", "200");
-
-            jsonConnection = (HttpsURLConnection) jsonURI.openConnection();
-
-            jsonConnection.setRequestMethod("GET");
-
-            jsonConnection.setRequestProperty("Ocp-Apim-Subscription-Key", subscriptionKey);
-
-            InputStream responseBody = jsonConnection.getInputStream();
-            InputStreamReader responseBodyReader =
-                new InputStreamReader(responseBody, StandardCharsets.UTF_8);
-            BufferedReader br = new BufferedReader(responseBodyReader);
-            StringBuilder sb = new StringBuilder();
-
-            String inputLine;
-            while ((inputLine = br.readLine()) != null) {
-              sb.append(inputLine);
-              System.out.println(inputLine);
-            }
-            Log.d("CHECKOUT", sb.toString());
-            if (sb.substring(0, Math.min(20, sb.length())).contains("Succeeded")) {
-              parsed = true;
-            } else {
-              jsonConnection.disconnect();
-              jsonConnection.connect();
-              Thread.sleep(50);
-            }
-          }
           Log.d("CHECKOUT", "200");
 
           InputStream responseBody = jsonConnection.getInputStream();
@@ -271,6 +237,7 @@ public class TestAzureActivity extends AppCompatActivity {
 
         } else if (response == 202) {
           Log.d("CHECKOUT", "202");
+
         } else {
           // Error handling code goes here
           Log.e("CHECKOUT", "Failed with " + response);
@@ -286,20 +253,20 @@ public class TestAzureActivity extends AppCompatActivity {
       return "";
     }
 
-
-
     @Override
     protected void onPreExecute() {
       super.onPreExecute();
-      dialog.setMessage("Analysing your receipt");
-      dialog.show();
+      // dialog.setMessage("Analysing your receipt");
+      // dialog.show();
     }
 
     @Override
     protected void onPostExecute(String s) {
       super.onPostExecute(s);
-      dialog.dismiss();
+      // dialog.dismiss();
       System.out.println("Payload: " + s);
+      /*Intent intent = new Intent(TestAzureActivity.this, PayLoadParser.class);
+      startActivity(intent);*/
     }
   }
 }
